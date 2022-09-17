@@ -61,7 +61,9 @@ jobs:
           files: "error.png"
           
       - name: ERROR screenshot
-        if: steps.check_files3.outputs.files_exists == 'true'
+        if: |
+          steps.check_files3.outputs.files_exists == 'true' &&
+          steps.check_files2.outputs.files_exists != 'true'
         run: |
           git add .
           git commit -m ERROR
