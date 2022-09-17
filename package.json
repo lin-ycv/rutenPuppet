@@ -1,0 +1,28 @@
+{
+  "name": "rutenpuppet",
+  "version": "0.0.1",
+  "description": "Puppet for ruten",
+  "main": "index.js",
+  "scripts": {
+    "claim": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lin-ycv/rutenPuppet.git"
+  },
+  "keywords": [
+    "ruten",
+    "puppeteer"
+  ],
+  "author": "Lin Yu Chieh (Victor)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lin-ycv/rutenPuppet/issues"
+  },
+  "homepage": "https://github.com/lin-ycv/rutenPuppet#readme",
+  "dependencies": {
+    "puppeteer-extra": "^3.3.4",
+    "puppeteer-extra-plugin-adblocker": "^2.13.5",
+    "puppeteer-extra-plugin-stealth": "^2.11.1"
+  }
+}

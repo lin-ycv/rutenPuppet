@@ -1,0 +1,68 @@
+name: ruten
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "8 8 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3.4.1
+      - name: Check for cookies -> Decrypt
+        id: check_files
+        uses: andstor/file-existence-action@v1.1.0
+        with:
+          files: "cookies.json.gpg"
+          
+      - name: Config git
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+      - name: Decrypt Cookies
+        env:
+          PHRASE: ${{ secrets.PHRASE }}
+        if: steps.check_files.outputs.files_exists == 'true'
+        run: gpg --decrypt --passphrase "$PHRASE" --batch --yes --output cookies.json cookies.json.gpg
+
+      - name: Run
+        env:
+          USERNAME: ${{ secrets.USER }}
+          PASSWORD: ${{ secrets.PASS }}
+        continue-on-error: true
+        run: |
+          npm ci
+          npm run claim -- $USERNAME $PASSWORD
+          
+      - name: Check for cookies -> Encrypt
+        id: check_files2
+        uses: andstor/file-existence-action@v1.1.0
+        with:
+          files: "cookies.json"
+          
+      - name: cookies
+        env:
+          PHRASE: ${{ secrets.PHRASE }}
+        if: steps.check_files2.outputs.files_exists == 'true'
+        run: |
+          gpg --passphrase "$PHRASE" --cipher-algo AES256 --batch --yes --symmetric cookies.json
+          git add .
+          git commit -m encryption
+          git push
+
+      - name: Check for Error screenshots
+        id: check_files3
+        uses: andstor/file-existence-action@v1.1.0
+        with:
+          files: "error.png"
+          
+      - name: ERROR screenshot
+        if: steps.check_files3.outputs.files_exists == 'true'
+        run: |
+          git add .
+          git commit -m ERROR
+          git push
