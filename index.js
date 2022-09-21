@@ -75,16 +75,18 @@ async function start(user = null, pass = null) {
         ]);
     }
     await page.waitForSelector('.rt-button-primary');
-    if (page.$('.rt-button-primary:not([disabled])') !== null) {
+    if (page.$('.rt-button-primary[disabled]') !== null) {
         console.log("already redeemed");
-        await page.screenshot({ path: "error.png"});
+        await page.screenshot({ path: "error.png" });
     }
     else {
         const getB = await (await page.$('.rt-button-primary'));
         getB.click();
         await page.waitForSelector('.rt-modal-title');
-        let result = page.$('.rt-modal-title').map(x => x.textContent);
+        let result = page.$('.rt-modal-title').evaluate(el => el.textContent);
         console.log(result);
+        console.log("redeemed");
+        await page.screenshot({ path: "error.png" });
     }
     await saveCookie(page);
     await browser.close();
