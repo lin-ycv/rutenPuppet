@@ -74,21 +74,27 @@ async function start(user = null, pass = null) {
             }),
         ]);
     }
-    await page.waitForSelector('.rt-button-primary');
-    if (page.$('.rt-button-primary[disabled]') !== null) {
-        console.log("already redeemed");
-        await page.screenshot({ path: "error.png" });
+    await page.waitForSelector('.mission-card-wrap');
+    await saveCookie(page);
+    if ((await page.$('button.rt-button-primary')) !== null) {
+        const el = await page.$('button.rt-button-primary');
+        const className = await (await el.getProperty('className')).jsonValue();
+        if (className.includes('disabled')) {
+            console.log('already redeemed');
+        }
+        else {
+            console.log(await (await page.$('button.rt-button-primary')).evaluate(b => b.textContent))
+            const b = await page.$('button.rt-button-primary');
+            await b.click();
+            console.log('✔ check in -n- got');
+        }
+        await page.waitForTimeout(2000)
+        await page.screenshot({ path: "result.png", fullPage: true });
     }
     else {
-        const getB = await (await page.$('.rt-button-primary'));
-        getB.click();
-        await page.waitForSelector('.rt-modal-title');
-        let result = page.$('.rt-modal-title').evaluate(el => el.textContent);
-        console.log(result);
-        console.log("redeemed");
-        await page.screenshot({ path: "error.png" });
+        throw 'no buttons for claiming';
     }
-    await saveCookie(page);
+
     await browser.close();
 }
 
